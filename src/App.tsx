@@ -128,7 +128,13 @@ export default function App(): JSX.Element {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand">💣 BOMBERMAN</div>
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true">💣</span>
+          <span className="brand-text">
+            <small>NEON PROTOCOL</small>
+            <strong>BOMBER<span>MAN</span></strong>
+          </span>
+        </div>
         <div className="top-actions">
           {screen === 'playing' && (
             <button className="btn ghost sm" onClick={() => setScreen('paused')} aria-label="Pause">
@@ -162,7 +168,7 @@ export default function App(): JSX.Element {
         </div>
 
         <AnimatePresence mode="wait">
-          {screen === 'menu' && <MainMenu key="menu" onStart={() => startGame(1, 3, 0)} />}
+          {screen === 'menu' && <MainMenu key="menu" onStart={(lvl) => startGame(lvl, 3, 0)} />}
           {screen === 'paused' && (
             <PauseMenu
               key="pause"
@@ -217,7 +223,7 @@ export default function App(): JSX.Element {
 
       <footer className="foot">
         <span>Move: WASD / Arrows · Bomb: Space · Pause: P/Esc</span>
-        <span className="dim">v1.0 · canvas fallback build (Pixi optional per spec)</span>
+        <span className="dim">v2.0 <span className="neon">NEON PROTOCOL</span> · 60 FPS · touch ready</span>
       </footer>
     </div>
   );
