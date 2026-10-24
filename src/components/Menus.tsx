@@ -10,6 +10,7 @@ const SECTORS = [
   { n: 3, name: 'VOID CIRCUIT', desc: 'Musuh cepat + jebakan rapat.' },
   { n: 4, name: 'MAGMA CORE', desc: 'Tekanan waktu & patroli padat.' },
   { n: 5, name: 'EVENT HORIZON', desc: 'Mode brutal. Hanya untuk legenda.' },
+  { n: 6, name: 'SHADOW DOJO', desc: 'Level ninja rahasia. Musuh tanpa ampun.' },
 ] as const;
 
 const LOADOUT = [

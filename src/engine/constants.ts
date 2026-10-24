@@ -13,7 +13,7 @@ export const MAX_SPEED = 260;
 
 export const POWERUP_DROP_CHANCE = 0.25;
 
-export const TIME_LIMITS = [180, 170, 160, 150, 140];
+export const TIME_LIMITS = [180, 170, 160, 150, 140, 130];
 
 export function timeLimitForLevel(level: number): number {
   if (level <= TIME_LIMITS.length) return TIME_LIMITS[level - 1];

@@ -90,6 +90,7 @@ src/
 - Smooth pixel movement (not instant tile jumps), with **corner-sliding assistance** so turning corners feels forgiving.
 - Starts with: 3 lives, 1 bomb, blast range 2, base speed.
 - After being hit: brief **invincibility with blinking** (about 2 seconds) and respawn at start.
+- Player character model is a **ninja** (dark hood, red headband/scarf, mask eye-slit). Keep the ninja look in all sprite/animation work.
 
 ### Bombs
 - Placed on the player's current tile. Fuse: **2 seconds**.
@@ -127,7 +128,8 @@ Power-ups can be destroyed by explosions (except the one just revealed).
 
 ### Levels
 - Increasing difficulty: more enemies, faster enemies, fewer blocks, time limit (e.g. 180s).
-- At least **5 levels**, then loop with scaling difficulty.
+- At least **6 levels**, then loop with scaling difficulty.
+- Level roster: 1 NEON SLUMS · 2 PLASMA GRID · 3 VOID CIRCUIT · 4 MAGMA CORE · 5 EVENT HORIZON · 6 SHADOW DOJO.
 
 ---
 
@@ -205,3 +207,30 @@ Power-ups can be destroyed by explosions (except the one just revealed).
 - If an asset is missing, create a placeholder and note where a real sprite/sound should go.
 - Ask me only when a decision truly blocks progress; otherwise choose a sensible default and mention it.
 - Do not add libraries beyond section 2 without explaining why.
+
+---
+
+## 11. Change Log
+
+### 2026-10-24 — Sixth level + ninja player model
+
+**New level: SHADOW DOJO (Sector 6)**
+- Added sector 6 to the main-menu roster (`src/components/Menus.tsx`): `SHADOW DOJO — Level ninja rahasia. Musuh tanpa ampun.`
+- Added a 6th time limit (`130s`) in `src/engine/constants.ts` (`TIME_LIMITS`), so Sector 6 no longer falls back to the generic `120s`.
+- Existing level scaling already supports level 6: 5 Wanderers + 4 Chasers + 3 Smart enemies, speed scaling continues, and levels past 6 still loop with scaling difficulty.
+
+**Player model is now a ninja**
+- Replaced the white bomber placeholder sprite in `src/components/GameCanvas.tsx` with a top-down ninja:
+  - dark hood and body, navy arms/legs;
+  - white mask eye-slit with pupils that follow the movement direction;
+  - red headband with a trailing ribbon;
+  - red waist sash and flowing scarf tails animated by `walkPhase`;
+  - existing shadow, walk bob, invincibility blink, and shield ring are preserved.
+- Gameplay stats, collision size (`PLAYER_SIZE`), and controls are unchanged.
+
+**Docs**
+- Updated AGENTS.md sections 4 (Player, Levels) and added this changelog.
+
+**Verification**
+- Run `npm test`, `npm run lint`, and `npm run build` after future edits to keep the level and sprite changes regression-free.
+

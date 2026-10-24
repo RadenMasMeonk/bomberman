@@ -226,36 +226,86 @@ function drawGame(ctx: CanvasRenderingContext2D, s: GameState, now: number, redu
     if (!blink) {
       const bob = p.moving && !reduceMotion ? Math.abs(Math.sin(p.walkPhase)) * 3 : 0;
       const cx = p.px + PLAYER_SIZE / 2;
+      const bx = p.px;
+      const by = p.py - bob;
+      const swing = p.moving && !reduceMotion ? Math.sin(p.walkPhase) : 0;
+      const ex0 = p.dir.x * 2.5;
+      const ey0 = p.dir.y * 2.5;
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.beginPath();
       ctx.ellipse(cx, p.py + PLAYER_SIZE + 1, 12, 4, 0, 0, Math.PI * 2);
       ctx.fill();
-      // body (white bomber)
-      ctx.fillStyle = '#f8fafc';
-      roundRect(ctx, p.px, p.py - bob, PLAYER_SIZE, PLAYER_SIZE, 11);
-      ctx.fill();
-      ctx.fillStyle = '#38bdf8';
-      roundRect(ctx, p.px + 3, p.py - bob + PLAYER_SIZE - 12, PLAYER_SIZE - 6, 9, 4);
-      ctx.fill();
-      // face direction eyes
-      const ex0 = p.dir.x * 3;
-      const ey0 = p.dir.y * 3;
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.arc(cx - 6 + ex0, p.py + 12 - bob + ey0, 3, 0, Math.PI * 2);
-      ctx.arc(cx + 6 + ex0, p.py + 12 - bob + ey0, 3, 0, Math.PI * 2);
-      ctx.fill();
-      // antenna
-      ctx.strokeStyle = '#ef4444';
+
+      // flowing scarf tails (behind the ninja)
+      ctx.strokeStyle = '#dc2626';
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(cx, p.py - bob);
-      ctx.lineTo(cx, p.py - 7 - bob);
+      ctx.moveTo(cx - 4, by + 14);
+      ctx.quadraticCurveTo(cx - 14 - swing * 4, by + 13, cx - 18 - swing * 3, by + 22);
       ctx.stroke();
-      ctx.fillStyle = '#ef4444';
       ctx.beginPath();
-      ctx.arc(cx, p.py - 8 - bob, 3, 0, Math.PI * 2);
+      ctx.moveTo(cx + 4, by + 14);
+      ctx.quadraticCurveTo(cx + 14 + swing * 4, by + 13, cx + 18 + swing * 3, by + 22);
+      ctx.stroke();
+
+      // legs
+      ctx.fillStyle = '#0b1220';
+      roundRect(ctx, bx + 5, by + 26, 9, 8, 3);
       ctx.fill();
+      roundRect(ctx, bx + PLAYER_SIZE - 14, by + 26, 9, 8, 3);
+      ctx.fill();
+
+      // ninja body
+      ctx.fillStyle = '#1e293b';
+      roundRect(ctx, bx + 3, by + 12, PLAYER_SIZE - 6, 17, 7);
+      ctx.fill();
+      ctx.strokeStyle = '#0b1220';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // arms
+      ctx.fillStyle = '#172033';
+      roundRect(ctx, bx - 1, by + 16, 6, 11, 3);
+      ctx.fill();
+      roundRect(ctx, bx + PLAYER_SIZE - 5, by + 16, 6, 11, 3);
+      ctx.fill();
+
+      // red waist sash
+      ctx.fillStyle = '#b91c1c';
+      roundRect(ctx, bx + 4, by + 25, PLAYER_SIZE - 8, 5, 2);
+      ctx.fill();
+
+      // hood
+      ctx.fillStyle = '#111827';
+      roundRect(ctx, bx + 5, by + 1, PLAYER_SIZE - 10, 15, 7);
+      ctx.fill();
+
+      // face slit + eyes looking along move direction
+      ctx.fillStyle = '#e2e8f0';
+      roundRect(ctx, cx - 8 + ex0, by + 7 + ey0, 16, 5, 2.5);
+      ctx.fill();
+      ctx.fillStyle = '#0b1220';
+      ctx.beginPath();
+      ctx.arc(cx - 3.5 + ex0 * 1.4, by + 9.5 + ey0, 1.9, 0, Math.PI * 2);
+      ctx.arc(cx + 3.5 + ex0 * 1.4, by + 9.5 + ey0, 1.9, 0, Math.PI * 2);
+      ctx.fill();
+
+      // red headband + trailing ribbon
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(bx + 4, by + 3.5, PLAYER_SIZE - 8, 3);
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 2.5;
+      const ribbon = p.dir.x < 0 ? -1 : 1;
+      ctx.beginPath();
+      ctx.moveTo(cx + ribbon * 6, by + 5);
+      ctx.quadraticCurveTo(
+        cx + ribbon * 12 + swing * 3,
+        by + 7,
+        cx + ribbon * 15 + swing * 4,
+        by + 13,
+      );
+      ctx.stroke();
+
       // shield ring
       if (s.time < p.shieldUntil) {
         ctx.strokeStyle = `rgba(59,130,246,${0.6 + 0.4 * Math.sin(now / 200)})`;
