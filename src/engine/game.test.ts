@@ -1,9 +1,19 @@
 import { describe, it, expect } from 'vitest';
-import { generateGrid, clearSpawn } from './grid';
+import { generateGrid, clearSpawn, isSolidCell } from './grid';
 import { computeBlast } from './explosion';
 import { createGame, updateGame } from './game';
+import { spawnEnemies, enemyTile } from './enemy';
 import { CellType } from './types';
 import { COLS, ROWS } from './constants';
+
+const IDLE = { up: false, down: false, left: false, right: false };
+
+function seeded(seed: number): () => number {
+  return () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+}
 
 describe('level generation', () => {
   it('keeps spawn L-shape clear', () => {
@@ -30,6 +40,41 @@ describe('level generation', () => {
     g[1][1] = CellType.Block;
     clearSpawn(g);
     expect(g[1][1]).toBe(CellType.Empty);
+  });
+});
+
+describe('enemy spawning', () => {
+  // Regression test for the "enemies sit still until a nearby block is blown up"
+  // bug: spawn spots used to be any empty tile, including pockets sealed on all
+  // four sides by destructible blocks.
+  it('never spawns enemies in sealed pockets', () => {
+    for (let seed = 1; seed <= 25; seed++) {
+      const s = createGame(1);
+      s.enemies = [];
+      spawnEnemies(s, [{ kind: 'wanderer', count: 12 }], () => 90, seeded(seed));
+      for (const e of s.enemies) {
+        const t = enemyTile(e);
+        const exits = [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ].filter(([dx, dy]) => !isSolidCell(s.grid, t.tx + dx, t.ty + dy));
+        expect(exits.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('enemies start moving on the first update', () => {
+    for (let seed = 1; seed <= 15; seed++) {
+      const s = createGame(1);
+      s.enemies = [];
+      spawnEnemies(s, [{ kind: 'wanderer', count: 10 }], () => 90, seeded(seed));
+      const before = s.enemies.map((e) => ({ x: e.px, y: e.py }));
+      for (let i = 0; i < 30; i++) updateGame(s, IDLE, 1 / 60, false);
+      const moved = s.enemies.filter((e, i) => e.px !== before[i].x || e.py !== before[i].y).length;
+      expect(moved).toBeGreaterThan(0);
+    }
   });
 });
 

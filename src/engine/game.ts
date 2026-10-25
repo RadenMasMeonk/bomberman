@@ -282,6 +282,16 @@ function updateEnemies(state: GameState, _input: InputState, dt: number): void {
         e.changeTimer = 0.8 + Math.random();
       }
     }
+    // BUG FIX (2026-10-25): safety net — if an enemy somehow has no direction
+    // (spawned in a pocket or BFS failed), try to pick a free one right away
+    // instead of standing still until a block nearby is destroyed.
+    if (e.dir.x === 0 && e.dir.y === 0) {
+      const free = randomFreeDir(state, e, e.kind === 'smart');
+      if (free) {
+        e.dir = free;
+        e.changeTimer = 0.4 + Math.random() * 0.6;
+      }
+    }
     // move with tile-center steering
     const step = e.speed * dt;
     const targetCx = et.tx * TILE + (TILE - PLAYER_SIZE) / 2;

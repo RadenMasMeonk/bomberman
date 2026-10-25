@@ -234,3 +234,44 @@ Power-ups can be destroyed by explosions (except the one just revealed).
 **Verification**
 - Run `npm test`, `npm run lint`, and `npm run build` after future edits to keep the level and sprite changes regression-free.
 
+### 2026-10-25 — Enemy spawn fix + main menu redesign
+
+**Bug: enemies stood still until the player blew up a nearby block**
+- Cause: `findSpawnSpot()` in `src/engine/enemy.ts` accepted *any* empty tile, including
+  pockets sealed on all four sides by destructible blocks. `randomFreeDir()` then returned
+  `null`, the enemy got `dir = {0,0}`, and it could not move until an explosion opened a path.
+  The initial direction was also picked from all four compass directions, so it could point
+  straight into a wall.
+- Fix (comments marked `BUG FIX (2026-10-25)` in the code):
+  - `findSpawnSpot()` now rejects sealed tiles (0 open neighbours), prefers junctions/corridors
+    (2+ open neighbours), and only falls back to a dead end if nothing better exists.
+  - Spawn spots are tracked in an `occupied` set so two enemies can never stack on one tile.
+  - The first direction now comes from `freeNeighbors()`, so it always points at an open tile.
+  - `updateEnemies()` in `src/engine/game.ts` has a safety net: if an enemy still ends up with
+    no direction, it immediately picks a free one instead of idling.
+- Regression tests added in `src/engine/game.test.ts`:
+  - `never spawns enemies in sealed pockets` (25 seeds, 12 enemies each);
+  - `enemies start moving on the first update` (15 seeds).
+
+**Main menu redesigned (was clipped and too dense)**
+- File: `src/components/Menus.tsx` (`MainMenu`) + menu styles in `src/index.css`
+  (block titled `main menu v2 (redesigned 2026-10-25)`).
+- Old menu was a dashboard crammed inside the canvas-sized stage with `overflow: hidden`,
+  so the bottom of the panel could be cut off. New version is a full-screen overlay
+  (`position: fixed`, scrollable) with a clear hierarchy:
+  - header: brand/logo + high score;
+  - left column: sector picker (6 cards with names + active-sector description),
+    big `START SECTOR` button, collapsible mission briefing;
+  - right column: loadout cards + controls;
+  - footer: audio mute/volume + build metadata.
+- Removed the decorative typewriter line, 3D tilt, fake status bar and the unused
+  `.sector-btn` / `.menu-panel` / `.logo-*` / `.typed-*` CSS. Pause/Game Over/Level Clear
+  panels and the shared `.status-bar` styles are unchanged.
+- Menu still supports `Enter` to start the selected sector and keeps the 6-sector roster
+  (including SHADOW DOJO).
+
+**Verification (this change)**
+- `npm test` → 11 tests pass.
+- `npm run lint` (tsc --noEmit) → clean.
+- `npm run build` → succeeds.
+
