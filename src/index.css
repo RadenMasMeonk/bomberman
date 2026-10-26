@@ -466,6 +466,386 @@ kbd {
   box-shadow: 0 0 10px rgba(0,240,255,0.2);
 }
 
+/* ---------- adventure quest main menu (2026-10-26) ---------- */
+/* Zelda-inspired dusk-forest theme. The neon menu-v2 rules above remain as a
+   structural base; every visible quest-menu surface is re-skinned here. */
+.menu-overlay.quest-overlay {
+  --q-ink: #241a0d;
+  --q-parch: #f2e6c5;
+  --q-parch-2: #d9c088;
+  --q-gold: #e8c66a;
+  --q-gold-bright: #ffe9a8;
+  --q-gold-deep: #9a7429;
+  --q-green: #103526;
+  --q-green-deep: #071a14;
+  --q-cream: #f6edcf;
+  --q-muted: #b9c7ae;
+  font-family: 'EB Garamond', Georgia, serif;
+  background:
+    radial-gradient(1100px 640px at 50% -12%, rgba(255, 226, 150, 0.16), transparent 60%),
+    radial-gradient(800px 520px at 14% 18%, rgba(44, 110, 78, 0.34), transparent 66%),
+    radial-gradient(900px 580px at 86% 14%, rgba(20, 64, 50, 0.42), transparent 66%),
+    linear-gradient(180deg, #061712 0%, #081f18 38%, #040d0a 100%);
+}
+.quest-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 42%, transparent 42%, rgba(0, 0, 0, 0.55) 100%);
+}
+.adventure-bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.adventure-moon {
+  position: absolute;
+  top: 5vh;
+  left: 50%;
+  width: min(38vw, 420px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, #fff8da, #ffdf94 38%, rgba(232, 198, 106, 0.2) 62%, transparent 72%);
+  filter: drop-shadow(0 0 80px rgba(255, 226, 150, 0.34));
+  opacity: 0.55;
+}
+.adventure-stars { position: absolute; inset: 0; }
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--q-gold-bright, #ffe9a8);
+  box-shadow: 0 0 8px #ffe9a8;
+  opacity: 0.55;
+  animation: twinkle 3.4s ease-in-out infinite;
+}
+@keyframes twinkle { 50% { opacity: 0.12; transform: scale(0.7); } }
+.adventure-ridge { position: absolute; left: -10%; right: -10%; bottom: 0; }
+.adventure-ridge.far {
+  bottom: 18%;
+  height: 34%;
+  background: linear-gradient(180deg, #0b2b20, #071a14);
+  opacity: 0.55;
+  filter: blur(1px);
+  clip-path: polygon(0 74%, 8% 52%, 16% 66%, 25% 38%, 34% 60%, 44% 30%, 54% 58%, 63% 42%, 72% 64%, 81% 36%, 90% 58%, 100% 46%, 100% 100%, 0 100%);
+}
+.adventure-ridge.near {
+  height: 34%;
+  background: linear-gradient(180deg, #0d3226, #04110d);
+  clip-path: polygon(0 82%, 9% 64%, 19% 76%, 28% 54%, 38% 72%, 48% 48%, 58% 70%, 68% 56%, 78% 74%, 88% 52%, 100% 68%, 100% 100%, 0 100%);
+}
+.adventure-fog {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: 0;
+  height: 32%;
+  background: radial-gradient(ellipse at 50% 100%, rgba(140, 210, 170, 0.16), transparent 68%);
+  filter: blur(28px);
+  animation: fogDrift 18s ease-in-out infinite alternate;
+}
+@keyframes fogDrift { to { transform: translateX(6%); } }
+.mote {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffd98a;
+  box-shadow: 0 0 10px #ffbf5a;
+  opacity: 0;
+  animation: moteRise 8s linear infinite;
+}
+@keyframes moteRise {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  18% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-130px) scale(1.15); }
+}
+
+.menu-shell.quest-shell {
+  width: min(980px, 100%);
+  padding: clamp(20px, 3.4vw, 38px);
+  gap: clamp(16px, 2.4vw, 24px);
+  border-radius: 14px;
+  border: 1px solid rgba(232, 198, 106, 0.55);
+  background:
+    radial-gradient(700px 280px at 50% -20%, rgba(232, 198, 106, 0.12), transparent 65%),
+    linear-gradient(180deg, rgba(15, 42, 32, 0.97), rgba(6, 18, 14, 0.985));
+  box-shadow:
+    0 34px 100px rgba(0, 0, 0, 0.7),
+    0 0 0 6px rgba(4, 12, 9, 0.55),
+    0 0 0 7px rgba(232, 198, 106, 0.18),
+    inset 0 1px 0 rgba(255, 233, 168, 0.18);
+}
+.quest-shell::before {
+  background: linear-gradient(135deg, rgba(255, 233, 168, 0.75), transparent 30%, transparent 70%, rgba(232, 198, 106, 0.55));
+}
+.quest-shell::after {
+  content: '◆';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 10px;
+  background: #071a14;
+  color: var(--q-gold);
+  font-size: 15px;
+  line-height: 1;
+  text-shadow: 0 0 14px rgba(232, 198, 106, 0.8);
+}
+.quest-shell .menu-head {
+  align-items: flex-end;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(232, 198, 106, 0.22);
+}
+.menu-crest {
+  position: relative;
+  width: 64px;
+  height: 58px;
+  flex: none;
+  filter: drop-shadow(0 0 14px rgba(232, 198, 106, 0.45));
+}
+.crest-tri {
+  position: absolute;
+  width: 30px;
+  height: 26px;
+  background: linear-gradient(180deg, #ffe9a8, #d8a94e 62%, #9a7429);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.crest-tri.t1 { top: 0; left: 17px; }
+.crest-tri.t2 { bottom: 0; left: 0; }
+.crest-tri.t3 { bottom: 0; right: 0; }
+.quest-shell .menu-kicker {
+  margin-bottom: 4px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 10px;
+  letter-spacing: 5px;
+  color: var(--q-gold-bright);
+  text-shadow: 0 0 14px rgba(232, 198, 106, 0.45);
+}
+.quest-shell .menu-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: clamp(28px, 4.6vw, 50px);
+  line-height: 0.95;
+  letter-spacing: 5px;
+  color: #f5e8bd;
+  text-shadow: 0 2px 0 #6b4b13, 0 0 30px rgba(232, 198, 106, 0.35);
+}
+.quest-shell .menu-title span {
+  color: var(--q-gold);
+  text-shadow: 0 2px 0 #6b4b13, 0 0 30px rgba(255, 214, 110, 0.55);
+}
+.menu-subtitle {
+  margin: 7px 0 0;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 9px;
+  letter-spacing: 2.7px;
+  color: var(--q-muted);
+  text-transform: uppercase;
+}
+.quest-shell .menu-best {
+  border: 1px solid rgba(232, 198, 106, 0.38);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(232, 198, 106, 0.12), rgba(232, 198, 106, 0.03));
+  box-shadow: inset 0 0 20px rgba(232, 198, 106, 0.08);
+}
+.quest-shell .menu-best small {
+  font-family: 'Cinzel', Georgia, serif;
+  letter-spacing: 2.5px;
+  color: var(--q-muted);
+}
+.quest-shell .menu-best b {
+  font-family: 'Cinzel', Georgia, serif;
+  color: var(--q-gold-bright);
+  text-shadow: 0 0 18px rgba(232, 198, 106, 0.5);
+}
+.quest-shell .menu-tagline {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 16.5px;
+  font-style: italic;
+  color: #d7e2c8;
+}
+.tag-rune { margin-right: 7px; color: var(--q-gold); font-style: normal; }
+.quest-shell .menu-label {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 9.5px;
+  letter-spacing: 2.8px;
+  color: var(--q-gold);
+}
+.quest-shell .menu-label span {
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffe9a8, #c99a3d);
+  color: #231705;
+  font-family: 'Cinzel', Georgia, serif;
+  box-shadow: 0 0 12px rgba(232, 198, 106, 0.35);
+}
+.quest-shell .sector-card {
+  min-height: 74px;
+  padding: 11px 12px 9px;
+  border: 1px solid rgba(232, 198, 106, 0.22);
+  border-radius: 6px;
+  background: linear-gradient(160deg, rgba(255, 236, 190, 0.055), rgba(255, 255, 255, 0.01));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+.quest-shell .sector-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, rgba(232, 198, 106, 0.75), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.quest-shell .sector-card:hover {
+  border-color: rgba(232, 198, 106, 0.55);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 18px rgba(232, 198, 106, 0.08);
+}
+.quest-shell .sector-card.active {
+  border-color: var(--q-gold);
+  background: linear-gradient(160deg, rgba(232, 198, 106, 0.2), rgba(16, 53, 38, 0.6));
+  box-shadow: 0 0 22px rgba(232, 198, 106, 0.18), inset 0 0 0 1px rgba(255, 233, 168, 0.35);
+}
+.quest-shell .sector-card.active::before { opacity: 1; }
+.quest-shell .sector-index {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  color: var(--q-gold);
+}
+.quest-shell .sector-name {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11.5px;
+  letter-spacing: 0.8px;
+  color: #f4e9c9;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+.quest-shell .sector-realm {
+  font-size: 11.5px;
+  font-style: italic;
+  line-height: 1.2;
+  color: var(--q-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.quest-shell .sector-dot { background: #4b6048; }
+.quest-shell .sector-card.active .sector-dot {
+  background: var(--q-gold-bright);
+  box-shadow: 0 0 10px var(--q-gold-bright);
+}
+.quest-shell .sector-detail {
+  border-left: 2px solid var(--q-gold);
+  border-radius: 0 6px 6px 0;
+  background: linear-gradient(90deg, rgba(232, 198, 106, 0.1), transparent);
+}
+.quest-shell .sector-detail span {
+  font-family: 'Cinzel', Georgia, serif;
+  color: var(--q-gold);
+}
+.quest-shell .sector-detail p {
+  font-size: 14.5px;
+  font-style: italic;
+  color: #dbe5ce;
+}
+.quest-shell .btn.menu-start {
+  border: 1px solid #ffe9a8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffe9a8, #e3bd61 55%, #b98a2e);
+  color: #231705;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 28px rgba(232, 198, 106, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 12px 30px rgba(0, 0, 0, 0.35);
+  animation: none;
+}
+.quest-shell .btn.menu-start:hover {
+  border-color: #fff3c8;
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+  box-shadow: 0 0 38px rgba(255, 220, 130, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 14px 34px rgba(0, 0, 0, 0.4);
+}
+.quest-shell .menu-start small {
+  border-color: rgba(35, 23, 5, 0.45);
+  color: #3a2a0c;
+}
+.start-sword { font-size: 20px; filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.4)); }
+.quest-shell .icon-btn {
+  border: 1px solid rgba(232, 198, 106, 0.35);
+  background: rgba(232, 198, 106, 0.08);
+  color: var(--q-cream);
+  font-family: 'EB Garamond', Georgia, serif;
+}
+.quest-shell .icon-btn:hover { box-shadow: 0 0 16px rgba(232, 198, 106, 0.28); }
+.quest-shell .menu-hint { color: var(--q-muted); font-style: italic; }
+.quest-shell .menu-brief {
+  border: 1px solid rgba(232, 198, 106, 0.28);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(242, 230, 197, 0.1), rgba(232, 198, 106, 0.03));
+  color: #e3ead7;
+  font-size: 14px;
+}
+.quest-panel {
+  padding: 12px;
+  border: 1px solid rgba(232, 198, 106, 0.16);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 246, 222, 0.045), rgba(0, 0, 0, 0.12));
+}
+.quest-shell .loadout-card {
+  border: 1px solid rgba(232, 198, 106, 0.3);
+  border-radius: 6px;
+  background: linear-gradient(180deg, #f1e3bd, #d9c088);
+  color: #2a2110;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 5px 14px rgba(0, 0, 0, 0.25);
+}
+.quest-shell .loadout-card:hover {
+  border-color: #ffe9a8;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(232, 198, 106, 0.18);
+}
+.quest-shell .loadout-card .ic { filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.5)); }
+.quest-shell .loadout-card b {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11.5px;
+  color: #2a2110;
+}
+.quest-shell .loadout-card span { color: #5a4a28; font-size: 12px; }
+.quest-shell .ctrl-item {
+  border: 1px solid rgba(232, 198, 106, 0.18);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.22);
+}
+.quest-shell .ctrl-item small { color: var(--q-muted); }
+.quest-shell kbd {
+  border: 1px solid #9a7429;
+  border-bottom-width: 3px;
+  background: linear-gradient(180deg, #f1e3bd, #d9c088);
+  color: #2a2110;
+  font-family: 'Cinzel', Georgia, serif;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+.quest-shell .menu-foot {
+  border-top: 1px solid rgba(232, 198, 106, 0.22);
+}
+.quest-shell .audio-chip {
+  border: 1px solid rgba(232, 198, 106, 0.25);
+  background: rgba(0, 0, 0, 0.25);
+}
+.quest-shell .vol { color: var(--q-muted); }
+.quest-shell .vol input[type='range'] { accent-color: #e3bd61; }
+.quest-shell .menu-foot-meta { color: #8fa48a; font-family: 'Cinzel', Georgia, serif; }
+.quest-shell .sector-card:focus-visible,
+.quest-shell .btn:focus-visible,
+.quest-shell .icon-btn:focus-visible {
+  outline: 2px solid var(--q-gold-bright);
+  outline-offset: 3px;
+}
+@media (max-width: 560px) {
+  .menu-shell.quest-shell { border-radius: 12px; }
+  .quest-shell .menu-title { letter-spacing: 3px; }
+  .quest-shell .menu-subtitle { letter-spacing: 1.8px; }
+  .quest-shell .menu-start { font-size: 13px; letter-spacing: 1.4px; }
+}
+
 /* ---------- buttons ---------- */
 .btn {
   background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.14);

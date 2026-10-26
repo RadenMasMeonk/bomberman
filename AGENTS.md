@@ -150,6 +150,18 @@ Power-ups can be destroyed by explosions (except the one just revealed).
 - **Accessibility:** visible focus states on menu buttons, keyboard navigable menus, `prefers-reduced-motion` respected (disable screen shake).
 - **Visual style:** pick a consistent retro/pixel-art look. Use free assets (e.g. from kenney.nl or opengameart.org) or draw simple placeholder sprites with shapes first, then swap in sprites later.
 
+### Main menu theme — Adventure Quest (2026-10-26)
+
+The main menu now uses a Zelda-inspired adventure-fantasy look, while the in-game HUD stays neon:
+
+- **Scene:** full-screen dusk forest — golden moon, drifting stars and embers, layered mountain ridges, low fog.
+- **Palette:** forest `#061712` / `#103526`, parchment `#f2e6c5` / `#d9c088`, gold `#e8c66a` / `#ffe9a8`, ink `#241a0d`.
+- **Type:** `Cinzel` for display and `EB Garamond` for lore/body, loaded in `index.html`; `Orbitron` / `Rajdhani` remain for gameplay UI.
+- **Crest:** CSS-only gold triangles (triforce-like), so no copyrighted asset is used.
+- **Layout:** same functional two-column flow — header (crest + `THE LEGEND OF BOMBERMAN` + Legend Record), left realm/chapter picker + `BEGIN THE QUEST`, right `ADVENTURER'S KIT` + `SACRED CONTROLS`, footer audio.
+- **Sector cards:** show `CHAPTER I–VI`, the original sector name, and a fantasy realm subtitle + lore. All six sectors and Enter-to-start are preserved.
+- **Where:** styles live in `src/index.css` under `adventure quest main menu (2026-10-26)`; they layer on top of the legacy menu-v2 rules.
+
 ---
 
 ## 6. Optional Features (only after core is done)
@@ -269,6 +281,24 @@ Power-ups can be destroyed by explosions (except the one just revealed).
   panels and the shared `.status-bar` styles are unchanged.
 - Menu still supports `Enter` to start the selected sector and keeps the 6-sector roster
   (including SHADOW DOJO).
+
+**Verification (this change)**
+- `npm test` → 11 tests pass.
+- `npm run lint` (tsc --noEmit) → clean.
+- `npm run build` → succeeds.
+
+### 2026-10-26 — Adventure / Zelda-inspired main menu
+
+**Main menu re-themed (functionality unchanged)**
+- `src/components/Menus.tsx` (`MainMenu`): replaced the neon arcade dashboard with an adventure-quest screen:
+  - CSS triforce-style crest + `THE LEGEND OF BOMBERMAN` title, `A BOMBER'S QUEST · SIX REALMS AWAIT` subtitle and `LEGEND RECORD` high score.
+  - Sector picker now uses `CHAPTER I–VI` labels, the original sector names, plus fantasy realm subtitles and lore descriptions.
+  - Primary CTA is `BEGIN THE QUEST`; briefing renamed to a mission scroll and translated to Indonesian.
+  - Loadout/controls reframed as `ADVENTURER'S KIT` and `SACRED CONTROLS`.
+- Added a dusk-forest backdrop: golden moon, twinkling stars, drifting embers, mountain ridges and fog (CSS-generated, no assets).
+- Added `Cinzel` + `EB Garamond` to `index.html` for the quest typography; gameplay fonts are unchanged.
+- New styles are in `src/index.css` under `adventure quest main menu (2026-10-26)` and layer over the legacy menu-v2 rules.
+- Preserved: 6-sector roster, Enter-to-start, briefing toggle, mute/volume, focus states and `prefers-reduced-motion` handling.
 
 **Verification (this change)**
 - `npm test` → 11 tests pass.

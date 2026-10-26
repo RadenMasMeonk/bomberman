@@ -3,27 +3,43 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 
 const SECTORS = [
-  { n: 1, name: 'NEON SLUMS', desc: 'Patrol ringan. Cocok untuk pemanasan.' },
-  { n: 2, name: 'PLASMA GRID', desc: 'Chaser mulai memburu. Waspada!' },
-  { n: 3, name: 'VOID CIRCUIT', desc: 'Musuh cepat + jebakan rapat.' },
-  { n: 4, name: 'MAGMA CORE', desc: 'Tekanan waktu & patroli padat.' },
-  { n: 5, name: 'EVENT HORIZON', desc: 'Mode brutal. Hanya untuk legenda.' },
-  { n: 6, name: 'SHADOW DOJO', desc: 'Level ninja rahasia. Musuh tanpa ampun.' },
+  { n: 1, name: 'NEON SLUMS', realm: 'The Lantern Market', desc: 'Kampung cahaya yang sunyi. Uji nyali sebelum melangkah lebih jauh.' },
+  { n: 2, name: 'PLASMA GRID', realm: 'The Shattered Stones', desc: 'Reruntuhan kristal tempat para pemburu mulai mengejar langkahmu.' },
+  { n: 3, name: 'VOID CIRCUIT', realm: 'The Hollow Woods', desc: 'Labirin hampa yang sempit. Musuh cepat bersembunyi di setiap tikungan.' },
+  { n: 4, name: 'MAGMA CORE', realm: 'The Molten Keep', desc: 'Jantung gunung yang mendidih. Waktu menyusut bersama nyala api.' },
+  { n: 5, name: 'EVENT HORIZON', realm: 'The Edge of Night', desc: 'Gerbang di ujung dunia. Hanya legenda yang sanggup bertahan.' },
+  { n: 6, name: 'SHADOW DOJO', realm: 'The Hidden Shrine', desc: 'Dojo tersembunyi para ninja. Tanpa ampun, tanpa amal.' },
 ] as const;
 
 const LOADOUT = [
-  { icon: '💣', title: 'Extra Bomb', desc: '+1 bom' },
-  { icon: '🔥', title: 'Fire Range', desc: '+1 ledakan' },
-  { icon: '⚡', title: 'Speed Up', desc: 'Gerak lincah' },
-  { icon: '🛡️', title: 'Shield', desc: '1 hit · 10s' },
+  { icon: '💣', title: 'Bomb Satchel', desc: '+1 bom' },
+  { icon: '🔥', title: 'Ember Rune', desc: '+1 jangkauan' },
+  { icon: '🌿', title: 'Swift Boots', desc: 'Gerak lincah' },
+  { icon: '🛡️', title: 'Aegis', desc: '1 hit · 10s' },
 ] as const;
 
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'] as const;
+
+const STARS = Array.from({ length: 34 }, (_, i) => ({
+  left: `${(i * 29 + 7) % 100}%`,
+  top: `${(i * 17 + 11) % 62}%`,
+  delay: `${(i % 7) * 0.45}s`,
+  size: `${1 + (i % 3)}px`,
+}));
+
+const MOTES = Array.from({ length: 18 }, (_, i) => ({
+  left: `${(i * 37 + 5) % 100}%`,
+  bottom: `${(i * 13) % 55}%`,
+  delay: `${(i % 9) * 0.8}s`,
+  duration: `${7 + (i % 5) * 1.6}s`,
+  size: `${2 + (i % 3)}px`,
+}));
+
 /**
- * Main menu redesign (2026-10-25).
- * Old layout: very dense dashboard crammed into the game-canvas area.
- * New layout: full-screen, two-column arcade screen with a hierarchy:
- * brand → sector select → start button, with loadout/controls on the side.
- * Everything scrolls when the viewport is short, so nothing gets clipped.
+ * Main menu — adventure / Zelda-inspired theme (2026-10-26).
+ * Replaces the neon arcade dashboard with a full-screen dusk-forest scene:
+ * moon, stars, mountain ridges, drifting embers, a golden crest, rune-era
+ * typography and "realm" chapter cards. Functionality is unchanged.
  */
 export function MainMenu(props: { onStart: (level: number) => void }): JSX.Element {
   const { highScore, muted, volume, toggleMute, setVolume } = useGameStore();
@@ -41,57 +57,93 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
 
   return (
     <motion.div
-      className="overlay menu-overlay"
+      className="overlay menu-overlay quest-overlay"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       role="dialog"
-      aria-label="Main menu Neon Protocol"
+      aria-label="Main menu Bomberman Quest"
     >
-      <div className="menu-bg" aria-hidden="true">
-        <div className="menu-glow a" />
-        <div className="menu-glow b" />
-        <div className="menu-grid-floor" />
-        <div className="menu-scan" />
+      <div className="menu-bg adventure-bg" aria-hidden="true">
+        <div className="adventure-moon" />
+        <div className="adventure-stars">
+          {STARS.map((s, i) => (
+            <span
+              key={i}
+              className="star"
+              style={{
+                left: s.left,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                animationDelay: s.delay,
+              }}
+            />
+          ))}
+        </div>
+        <div className="adventure-ridge far" />
+        <div className="adventure-ridge near" />
+        <div className="adventure-fog" />
+        {MOTES.map((m, i) => (
+          <span
+            key={i}
+            className="mote"
+            style={{
+              left: m.left,
+              bottom: m.bottom,
+              width: m.size,
+              height: m.size,
+              animationDelay: m.delay,
+              animationDuration: m.duration,
+            }}
+          />
+        ))}
       </div>
 
       <motion.div
-        className="menu-shell"
+        className="menu-shell quest-shell"
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 220, damping: 24 }}
       >
         <header className="menu-head">
           <div className="menu-brand">
-            <motion.span
-              className="menu-bomb"
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+            <motion.div
+              className="menu-crest"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               aria-hidden="true"
             >
-              💣
-            </motion.span>
+              <span className="crest-tri t1" />
+              <span className="crest-tri t2" />
+              <span className="crest-tri t3" />
+            </motion.div>
             <div>
-              <p className="menu-kicker">NEON PROTOCOL // ARCADE BREACH</p>
+              <p className="menu-kicker">THE LEGEND OF</p>
               <h1 className="menu-title">
                 BOMBER<span>MAN</span>
               </h1>
+              <p className="menu-subtitle">A BOMBER'S QUEST · SIX REALMS AWAIT</p>
             </div>
           </div>
           <div className="menu-best">
-            <small>HIGH SCORE</small>
+            <small>LEGEND RECORD</small>
             <b>{String(highScore).padStart(6, '0')}</b>
           </div>
         </header>
 
         <div className="menu-columns">
           <section className="menu-play">
-            <p className="menu-tagline">Blast blocks. Dodge sentries. Breach the exit gate.</p>
+            <p className="menu-tagline">
+              <span className="tag-rune" aria-hidden="true">✦</span>
+              Jawab panggilan petualangan. Bobol lorong, kalahkan penjaga, dan buka
+              gerbang keluar sebelum fajar padam.
+            </p>
 
             <div className="menu-label">
-              <span>01</span> SELECT SECTOR
+              <span>I</span> CHOOSE YOUR REALM
             </div>
-            <div className="sector-grid" role="radiogroup" aria-label="Pilih sector">
+            <div className="sector-grid" role="radiogroup" aria-label="Pilih realm">
               {SECTORS.map((s) => {
                 const active = sector === s.n;
                 return (
@@ -105,8 +157,9 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <span className="sector-index">S-{String(s.n).padStart(2, '0')}</span>
+                    <span className="sector-index">CHAPTER {ROMAN[s.n - 1]}</span>
                     <span className="sector-name">{s.name}</span>
+                    <span className="sector-realm">{s.realm}</span>
                     <span className="sector-dot" aria-hidden="true" />
                   </motion.button>
                 );
@@ -115,7 +168,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
 
             <div className="sector-detail">
               <span>
-                SECTOR {String(sector).padStart(2, '0')} / {SECTORS.length}
+                REALM {String(sector).padStart(2, '0')} / {SECTORS.length}
               </span>
               <p>{activeSector.desc}</p>
             </div>
@@ -127,7 +180,8 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span>▶ START SECTOR {String(sector).padStart(2, '0')}</span>
+              <span className="start-sword" aria-hidden="true">⚔</span>
+              <span>BEGIN THE QUEST</span>
               <small>ENTER</small>
             </motion.button>
 
@@ -138,9 +192,9 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
                 onClick={() => setShowHow((v) => !v)}
                 aria-expanded={showHow}
               >
-                {showHow ? '▾ Hide briefing' : '▸ Mission briefing'}
+                {showHow ? '▾ Tutup gulungan' : '▸ Buka gulungan misi'}
               </button>
-              <span className="menu-hint">WASD / arrows · Space bombs · P pause</span>
+              <span className="menu-hint">WASD / panah · Space bom · P jeda</span>
             </div>
 
             {showHow && (
@@ -149,20 +203,20 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
               >
-                <b>🎯 Mission</b>
+                <b>📜 Gulungan Misi</b>
                 <ol>
-                  <li>Blow up blocks and grab power-ups.</li>
-                  <li>Defeat every sentry, then reach the golden door.</li>
-                  <li>Bombs fuse for 2s and chain-react. Don't trap yourself!</li>
+                  <li>Hancurkan blok dan pungut rune kekuatan.</li>
+                  <li>Kalahkan semua penjaga, lalu masuki gerbang emas.</li>
+                  <li>Bom menyala 2 detik dan memicu rantai. Jangan terjebak!</li>
                 </ol>
               </motion.div>
             )}
           </section>
 
           <aside className="menu-info">
-            <div>
+            <div className="quest-panel">
               <div className="menu-label">
-                <span>02</span> LOADOUT
+                <span>II</span> ADVENTURER'S KIT
               </div>
               <div className="loadout-grid">
                 {LOADOUT.map((p, i) => (
@@ -185,9 +239,9 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
               </div>
             </div>
 
-            <div>
+            <div className="quest-panel">
               <div className="menu-label">
-                <span>03</span> CONTROLS
+                <span>III</span> SACRED CONTROLS
               </div>
               <div className="ctrl-grid">
                 <div className="ctrl-item">
@@ -218,7 +272,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
         <footer className="menu-foot">
           <div className="audio-chip">
             <button type="button" className="icon-btn" onClick={toggleMute} aria-pressed={muted}>
-              {muted ? '🔇 Mute' : '🔊 Sound'}
+              {muted ? '🔇 Bisu' : '🔊 Nyala'}
             </button>
             <label className="vol">
               VOL
@@ -234,7 +288,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
             </label>
           </div>
           <div className="menu-foot-meta">
-            <span>GRID 15×13</span>
+            <span>REALM 15×13</span>
             <span>CHAIN-BLAST ON</span>
             <span>TOUCH READY</span>
           </div>
