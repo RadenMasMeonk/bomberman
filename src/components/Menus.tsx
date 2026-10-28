@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
+import { SKINS, getSkin } from '../skins';
 
 const SECTORS = [
   { n: 1, name: 'NEON SLUMS', realm: 'The Lantern Market', desc: 'Kampung cahaya yang sunyi. Uji nyali sebelum melangkah lebih jauh.' },
@@ -42,10 +43,11 @@ const MOTES = Array.from({ length: 18 }, (_, i) => ({
  * typography and "realm" chapter cards. Functionality is unchanged.
  */
 export function MainMenu(props: { onStart: (level: number) => void }): JSX.Element {
-  const { highScore, muted, volume, toggleMute, setVolume } = useGameStore();
+  const { highScore, muted, volume, skin, toggleMute, setVolume, setSkin } = useGameStore();
   const [sector, setSector] = useState<number>(1);
   const [showHow, setShowHow] = useState(false);
   const activeSector = SECTORS.find((s) => s.n === sector) ?? SECTORS[0];
+  const activeSkin = getSkin(skin);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
@@ -241,7 +243,47 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
 
             <div className="quest-panel">
               <div className="menu-label">
-                <span>III</span> SACRED CONTROLS
+                <span>III</span> CHOOSE YOUR NINJA
+              </div>
+              <div className="skin-grid" role="radiogroup" aria-label="Pilih skin ninja">
+                {SKINS.map((s) => {
+                  const active = skin === s.id;
+                  return (
+                    <motion.button
+                      key={s.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      className={`skin-card${active ? ' active' : ''}`}
+                      onClick={() => setSkin(s.id)}
+                      title={s.desc}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.96 }}
+                    >
+                      <span
+                        className="skin-swatch"
+                        aria-hidden="true"
+                        style={{
+                          background: `linear-gradient(160deg, ${s.palette.hood}, ${s.palette.body})`,
+                          borderColor: s.palette.accent,
+                        }}
+                      >
+                        <span className="skin-band" style={{ background: s.palette.accent }} />
+                      </span>
+                      <span className="skin-meta">
+                        <b>{s.name}</b>
+                        <small>{s.realm}</small>
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+              <p className="skin-desc">{activeSkin.desc}</p>
+            </div>
+
+            <div className="quest-panel">
+              <div className="menu-label">
+                <span>IV</span> SACRED CONTROLS
               </div>
               <div className="ctrl-grid">
                 <div className="ctrl-item">

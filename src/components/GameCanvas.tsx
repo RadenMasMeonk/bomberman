@@ -2,6 +2,8 @@ import { memo, useEffect, useRef } from 'react';
 import { COLS, ROWS, TILE } from '../engine/constants';
 import { CellType, type GameState } from '../engine/types';
 import { PLAYER_SIZE } from '../engine/player';
+import { getSkin, type Skin } from '../skins';
+import { useGameStore } from '../store/gameStore';
 
 const W = COLS * TILE;
 const H = ROWS * TILE;
@@ -16,7 +18,13 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath();
 }
 
-function drawGame(ctx: CanvasRenderingContext2D, s: GameState, now: number, reduceMotion: boolean): void {
+function drawGame(
+  ctx: CanvasRenderingContext2D,
+  s: GameState,
+  now: number,
+  reduceMotion: boolean,
+  skin: Skin,
+): void {
   ctx.clearRect(0, 0, W, H);
   ctx.save();
   // screen shake
@@ -231,13 +239,14 @@ function drawGame(ctx: CanvasRenderingContext2D, s: GameState, now: number, redu
       const swing = p.moving && !reduceMotion ? Math.sin(p.walkPhase) : 0;
       const ex0 = p.dir.x * 2.5;
       const ey0 = p.dir.y * 2.5;
+      const pal = skin.palette;
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       ctx.beginPath();
       ctx.ellipse(cx, p.py + PLAYER_SIZE + 1, 12, 4, 0, 0, Math.PI * 2);
       ctx.fill();
 
       // flowing scarf tails (behind the ninja)
-      ctx.strokeStyle = '#dc2626';
+      ctx.strokeStyle = pal.accent;
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(cx - 4, by + 14);
@@ -249,51 +258,51 @@ function drawGame(ctx: CanvasRenderingContext2D, s: GameState, now: number, redu
       ctx.stroke();
 
       // legs
-      ctx.fillStyle = '#0b1220';
+      ctx.fillStyle = pal.limbs;
       roundRect(ctx, bx + 5, by + 26, 9, 8, 3);
       ctx.fill();
       roundRect(ctx, bx + PLAYER_SIZE - 14, by + 26, 9, 8, 3);
       ctx.fill();
 
       // ninja body
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = pal.body;
       roundRect(ctx, bx + 3, by + 12, PLAYER_SIZE - 6, 17, 7);
       ctx.fill();
-      ctx.strokeStyle = '#0b1220';
+      ctx.strokeStyle = pal.bodyEdge;
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
       // arms
-      ctx.fillStyle = '#172033';
+      ctx.fillStyle = pal.limbs;
       roundRect(ctx, bx - 1, by + 16, 6, 11, 3);
       ctx.fill();
       roundRect(ctx, bx + PLAYER_SIZE - 5, by + 16, 6, 11, 3);
       ctx.fill();
 
-      // red waist sash
-      ctx.fillStyle = '#b91c1c';
+      // waist sash
+      ctx.fillStyle = pal.accent;
       roundRect(ctx, bx + 4, by + 25, PLAYER_SIZE - 8, 5, 2);
       ctx.fill();
 
       // hood
-      ctx.fillStyle = '#111827';
+      ctx.fillStyle = pal.hood;
       roundRect(ctx, bx + 5, by + 1, PLAYER_SIZE - 10, 15, 7);
       ctx.fill();
 
       // face slit + eyes looking along move direction
-      ctx.fillStyle = '#e2e8f0';
+      ctx.fillStyle = pal.mask;
       roundRect(ctx, cx - 8 + ex0, by + 7 + ey0, 16, 5, 2.5);
       ctx.fill();
-      ctx.fillStyle = '#0b1220';
+      ctx.fillStyle = pal.eyes;
       ctx.beginPath();
       ctx.arc(cx - 3.5 + ex0 * 1.4, by + 9.5 + ey0, 1.9, 0, Math.PI * 2);
       ctx.arc(cx + 3.5 + ex0 * 1.4, by + 9.5 + ey0, 1.9, 0, Math.PI * 2);
       ctx.fill();
 
-      // red headband + trailing ribbon
-      ctx.fillStyle = '#dc2626';
+      // headband + trailing ribbon
+      ctx.fillStyle = pal.accent;
       ctx.fillRect(bx + 4, by + 3.5, PLAYER_SIZE - 8, 3);
-      ctx.strokeStyle = '#dc2626';
+      ctx.strokeStyle = pal.accent;
       ctx.lineWidth = 2.5;
       const ribbon = p.dir.x < 0 ? -1 : 1;
       ctx.beginPath();
@@ -308,11 +317,14 @@ function drawGame(ctx: CanvasRenderingContext2D, s: GameState, now: number, redu
 
       // shield ring
       if (s.time < p.shieldUntil) {
-        ctx.strokeStyle = `rgba(59,130,246,${0.6 + 0.4 * Math.sin(now / 200)})`;
+        ctx.save();
+        ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 200);
+        ctx.strokeStyle = pal.aura;
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(cx, p.py + PLAYER_SIZE / 2 - bob, PLAYER_SIZE / 2 + 6, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.restore();
       }
     }
   }
@@ -347,6 +359,9 @@ interface Props {
 export const GameCanvas = memo(function GameCanvas({ gameRef }: Props): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduceMotion = useRef(false);
+  const skinId = useGameStore((s) => s.skin);
+  const skinRef = useRef(getSkin(skinId));
+  skinRef.current = getSkin(skinId);
 
   useEffect(() => {
     reduceMotion.current = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -355,7 +370,7 @@ export const GameCanvas = memo(function GameCanvas({ gameRef }: Props): JSX.Elem
     let raf = 0;
     const render = () => {
       const s = gameRef.current;
-      if (s) drawGame(ctx, s, performance.now(), reduceMotion.current);
+      if (s) drawGame(ctx, s, performance.now(), reduceMotion.current, skinRef.current);
       raf = requestAnimationFrame(render);
     };
     raf = requestAnimationFrame(render);

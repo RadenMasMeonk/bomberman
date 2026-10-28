@@ -67,7 +67,8 @@ src/
     LevelComplete.tsx
     TouchControls.tsx # on-screen D-pad + bomb button for mobile
   store/
-    gameStore.ts      # Zustand store (screen, score, lives, level)
+    gameStore.ts      # Zustand store (screen, score, lives, level, skin)
+  skins.ts            # skin roster (palettes) shared by menu + canvas
   assets/
     sprites/ sounds/ fonts/
   App.tsx
@@ -91,6 +92,7 @@ src/
 - Starts with: 3 lives, 1 bomb, blast range 2, base speed.
 - After being hit: brief **invincibility with blinking** (about 2 seconds) and respawn at start.
 - Player character model is a **ninja** (dark hood, red headband/scarf, mask eye-slit). Keep the ninja look in all sprite/animation work.
+- **Skin system:** the ninja's palette is selectable from 6 skins (`crimson`, `azure`, `jade`, `amethyst`, `gilded`, `frost`) defined in `src/skins.ts`. The chosen skin is stored in Zustand (`skin`) and persisted to `localStorage` under `bomberman-skin`; `GameCanvas` reads it and re-colours the ninja's hood, body, limbs, sash, headband/scarf, mask and shield ring. Skins are cosmetic only — gameplay stats, collision and controls never change.
 
 ### Bombs
 - Placed on the player's current tile. Fuse: **2 seconds**.
@@ -161,6 +163,14 @@ The main menu now uses a Zelda-inspired adventure-fantasy look, while the in-gam
 - **Layout:** same functional two-column flow — header (crest + `THE LEGEND OF BOMBERMAN` + Legend Record), left realm/chapter picker + `BEGIN THE QUEST`, right `ADVENTURER'S KIT` + `SACRED CONTROLS`, footer audio.
 - **Sector cards:** show `CHAPTER I–VI`, the original sector name, and a fantasy realm subtitle + lore. All six sectors and Enter-to-start are preserved.
 - **Where:** styles live in `src/index.css` under `adventure quest main menu (2026-10-26)`; they layer on top of the legacy menu-v2 rules.
+
+### Skin picker — "CHOOSE YOUR NINJA" (2026-10-28)
+
+- The main menu's right column now has a third quest panel, `III — CHOOSE YOUR NINJA`, between the Adventurer's Kit and the (renumbered `IV`) Sacred Controls.
+- Six skin cards (`CRIMSON RONIN`, `AZURE TIDE`, `JADE SPECTER`, `AMETHYST VEIL`, `GILDED WARDEN`, `FROST SHADE`) each show a live palette swatch (hood → body gradient, accent band) plus realm label; the selected skin's description sits below the grid.
+- Selecting a skin updates the store immediately and persists across reloads; the in-game ninja recolours on the next frame without touching the game engine.
+- Skin data lives in `src/skins.ts` (`SKINS`, `DEFAULT_SKIN_ID`, `getSkin`, `isSkinId`). Add new skins there; the menu and canvas pick them up automatically.
+- Where: markup in `src/components/Menus.tsx` (`MainMenu`), rendering in `src/components/GameCanvas.tsx`, styles in `src/index.css` under `skin picker (2026-10-28)`.
 
 ---
 
@@ -302,6 +312,24 @@ The main menu now uses a Zelda-inspired adventure-fantasy look, while the in-gam
 
 **Verification (this change)**
 - `npm test` → 11 tests pass.
+- `npm run lint` (tsc --noEmit) → clean.
+- `npm run build` → succeeds.
+
+### 2026-10-28 — Player skin selector
+
+**New feature: changeable ninja skins**
+- Added `src/skins.ts`: six palette definitions (`crimson` default, `azure`, `jade`, `amethyst`, `gilded`, `frost`) with `name`, `realm`, `desc`, `swatch` and a `palette` (`body`, `bodyEdge`, `limbs`, `hood`, `accent`, `mask`, `eyes`, `aura`). Helpers: `DEFAULT_SKIN_ID`, `getSkin(id)` (safe fallback), `isSkinId(id)`.
+- `src/store/gameStore.ts`: new `skin` state + `setSkin()`; loads/saves `localStorage['bomberman-skin']` and rejects unknown ids.
+- `src/components/Menus.tsx` (`MainMenu`): new `III — CHOOSE YOUR NINJA` panel with six live swatch cards and the selected skin's description; Sacred Controls renumbered to `IV`.
+- `src/components/GameCanvas.tsx`: `drawGame()` now takes a `Skin` and uses its palette for hood, body, limbs, sash, headband/scarf and shield-ring glow (previously hard-coded). Subscribes to `skin` via Zustand so changes apply on the next frame.
+- `src/index.css`: `skin picker (2026-10-28)` block styles the swatch grid, active state, descriptions and focus ring, matching the quest theme.
+- Cosmetic only: movement, collision, bombs, scoring and enemies are untouched.
+
+**Tests**
+- Added `src/skins.test.ts`: unique ids, default present, known-id lookup, unknown/null fallback, and palette colours are complete hex values.
+
+**Verification (this change)**
+- `npm test` → 16 tests pass.
 - `npm run lint` (tsc --noEmit) → clean.
 - `npm run build` → succeeds.
 
