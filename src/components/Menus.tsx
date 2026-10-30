@@ -21,26 +21,20 @@ const LOADOUT = [
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'] as const;
 
-const STARS = Array.from({ length: 34 }, (_, i) => ({
-  left: `${(i * 29 + 7) % 100}%`,
-  top: `${(i * 17 + 11) % 62}%`,
-  delay: `${(i % 7) * 0.45}s`,
-  size: `${1 + (i % 3)}px`,
-}));
-
-const MOTES = Array.from({ length: 18 }, (_, i) => ({
-  left: `${(i * 37 + 5) % 100}%`,
-  bottom: `${(i * 13) % 55}%`,
-  delay: `${(i % 9) * 0.8}s`,
-  duration: `${7 + (i % 5) * 1.6}s`,
-  size: `${2 + (i % 3)}px`,
+const BUBBLES = Array.from({ length: 16 }, (_, i) => ({
+  left: `${(i * 41 + 6) % 100}%`,
+  delay: `${(i % 8) * 0.9}s`,
+  duration: `${9 + (i % 5) * 1.8}s`,
+  size: `${8 + (i % 4) * 7}px`,
+  color: ['#ffd23f', '#ff5a5f', '#4ecb71', '#3a86ff', '#9b5de5'][i % 5],
 }));
 
 /**
- * Main menu — adventure / Zelda-inspired theme (2026-10-26).
- * Replaces the neon arcade dashboard with a full-screen dusk-forest scene:
- * moon, stars, mountain ridges, drifting embers, a golden crest, rune-era
- * typography and "realm" chapter cards. Functionality is unchanged.
+ * Main menu — cartoon / comic theme (2026-10-30).
+ * Replaces the dusk-forest quest scene with a bright Saturday-morning
+ * cartoon: sunny sky, puffy clouds, rolling hills, floating bubbles, a
+ * bouncing bomb mascot, chunky outlined type and bouncy arcade buttons.
+ * All gameplay functionality is unchanged.
  */
 export function MainMenu(props: { onStart: (level: number) => void }): JSX.Element {
   const { highScore, muted, volume, skin, toggleMute, setVolume, setSkin } = useGameStore();
@@ -59,77 +53,57 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
 
   return (
     <motion.div
-      className="overlay menu-overlay quest-overlay"
+      className="overlay menu-overlay cartoon-overlay"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       role="dialog"
-      aria-label="Main menu Bomberman Quest"
+      aria-label="Main menu Bomberman Cartoon"
     >
-      <div className="menu-bg adventure-bg" aria-hidden="true">
-        <div className="adventure-moon" />
-        <div className="adventure-stars">
-          {STARS.map((s, i) => (
-            <span
-              key={i}
-              className="star"
-              style={{
-                left: s.left,
-                top: s.top,
-                width: s.size,
-                height: s.size,
-                animationDelay: s.delay,
-              }}
-            />
-          ))}
-        </div>
-        <div className="adventure-ridge far" />
-        <div className="adventure-ridge near" />
-        <div className="adventure-fog" />
-        {MOTES.map((m, i) => (
+      <div className="menu-bg cartoon-bg" aria-hidden="true">
+        <div className="cartoon-sun" />
+        <div className="cartoon-cloud c1" />
+        <div className="cartoon-cloud c2" />
+        <div className="cartoon-cloud c3" />
+        <div className="cartoon-hill h1" />
+        <div className="cartoon-hill h2" />
+        {BUBBLES.map((b, i) => (
           <span
             key={i}
-            className="mote"
+            className="bubble"
             style={{
-              left: m.left,
-              bottom: m.bottom,
-              width: m.size,
-              height: m.size,
-              animationDelay: m.delay,
-              animationDuration: m.duration,
+              left: b.left,
+              width: b.size,
+              height: b.size,
+              background: b.color,
+              animationDelay: b.delay,
+              animationDuration: b.duration,
             }}
           />
         ))}
       </div>
 
       <motion.div
-        className="menu-shell quest-shell"
+        className="menu-shell cartoon-shell"
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 220, damping: 24 }}
       >
         <header className="menu-head">
           <div className="menu-brand">
-            <motion.div
-              className="menu-crest"
-              animate={{ y: [0, -4, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              aria-hidden="true"
-            >
-              <span className="crest-tri t1" />
-              <span className="crest-tri t2" />
-              <span className="crest-tri t3" />
-            </motion.div>
+            <div className="cartoon-bomb" aria-hidden="true">
+              <span className="cartoon-spark" />
+            </div>
             <div>
-              <p className="menu-kicker">THE LEGEND OF</p>
+              <p className="menu-kicker">SUPER BLAST ADVENTURE</p>
               <h1 className="menu-title">
                 BOMBER<span>MAN</span>
               </h1>
-              <p className="menu-subtitle">A BOMBER'S QUEST · SIX REALMS AWAIT</p>
+              <p className="menu-subtitle">POP! BOOM! ZAP! · SIX WORLDS OF FUN</p>
             </div>
           </div>
           <div className="menu-best">
-            <small>LEGEND RECORD</small>
+            <small>HIGH SCORE</small>
             <b>{String(highScore).padStart(6, '0')}</b>
           </div>
         </header>
@@ -137,15 +111,15 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
         <div className="menu-columns">
           <section className="menu-play">
             <p className="menu-tagline">
-              <span className="tag-rune" aria-hidden="true">✦</span>
-              Jawab panggilan petualangan. Bobol lorong, kalahkan penjaga, dan buka
-              gerbang keluar sebelum fajar padam.
+              <span className="tag-rune" aria-hidden="true">💥</span>
+              Petualangan penuh ledakan! Pecahkan blok, kumpulkan kekuatan, dan
+              kalahkan para penjaga sebelum bom meledak!
             </p>
 
             <div className="menu-label">
-              <span>I</span> CHOOSE YOUR REALM
+              <span>I</span> PILIH DUNIA
             </div>
-            <div className="sector-grid" role="radiogroup" aria-label="Pilih realm">
+            <div className="sector-grid" role="radiogroup" aria-label="Pilih dunia">
               {SECTORS.map((s) => {
                 const active = sector === s.n;
                 return (
@@ -159,7 +133,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <span className="sector-index">CHAPTER {ROMAN[s.n - 1]}</span>
+                    <span className="sector-index">WORLD {ROMAN[s.n - 1]}</span>
                     <span className="sector-name">{s.name}</span>
                     <span className="sector-realm">{s.realm}</span>
                     <span className="sector-dot" aria-hidden="true" />
@@ -170,7 +144,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
 
             <div className="sector-detail">
               <span>
-                REALM {String(sector).padStart(2, '0')} / {SECTORS.length}
+                DUNIA {String(sector).padStart(2, '0')} / {SECTORS.length}
               </span>
               <p>{activeSector.desc}</p>
             </div>
@@ -182,8 +156,8 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="start-sword" aria-hidden="true">⚔</span>
-              <span>BEGIN THE QUEST</span>
+              <span className="start-bomb" aria-hidden="true">💣</span>
+              <span>AYO MAIN!</span>
               <small>ENTER</small>
             </motion.button>
 
@@ -194,7 +168,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
                 onClick={() => setShowHow((v) => !v)}
                 aria-expanded={showHow}
               >
-                {showHow ? '▾ Tutup gulungan' : '▸ Buka gulungan misi'}
+                {showHow ? '▾ Tutup petunjuk' : '▸ Buka petunjuk'}
               </button>
               <span className="menu-hint">WASD / panah · Space bom · P jeda</span>
             </div>
@@ -205,11 +179,11 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
               >
-                <b>📜 Gulungan Misi</b>
+                <b>📖 Cara Main</b>
                 <ol>
-                  <li>Hancurkan blok dan pungut rune kekuatan.</li>
-                  <li>Kalahkan semua penjaga, lalu masuki gerbang emas.</li>
-                  <li>Bom menyala 2 detik dan memicu rantai. Jangan terjebak!</li>
+                  <li>Hancurkan blok dan ambil item kekuatan.</li>
+                  <li>Kalahkan semua musuh, lalu masuk pintu keluar.</li>
+                  <li>Bom meledak setelah 2 detik dan memicu rantai. Jangan terjebak!</li>
                 </ol>
               </motion.div>
             )}
@@ -218,7 +192,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
           <aside className="menu-info">
             <div className="quest-panel">
               <div className="menu-label">
-                <span>II</span> ADVENTURER'S KIT
+                <span>II</span> TAS PETUALANG
               </div>
               <div className="loadout-grid">
                 {LOADOUT.map((p, i) => (
@@ -243,7 +217,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
 
             <div className="quest-panel">
               <div className="menu-label">
-                <span>III</span> CHOOSE YOUR NINJA
+                <span>III</span> PILIH NINJA
               </div>
               <div className="skin-grid" role="radiogroup" aria-label="Pilih skin ninja">
                 {SKINS.map((s) => {
@@ -283,7 +257,7 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
 
             <div className="quest-panel">
               <div className="menu-label">
-                <span>IV</span> SACRED CONTROLS
+                <span>IV</span> KONTROL
               </div>
               <div className="ctrl-grid">
                 <div className="ctrl-item">
@@ -330,9 +304,9 @@ export function MainMenu(props: { onStart: (level: number) => void }): JSX.Eleme
             </label>
           </div>
           <div className="menu-foot-meta">
-            <span>REALM 15×13</span>
-            <span>CHAIN-BLAST ON</span>
-            <span>TOUCH READY</span>
+            <span>PAPAN 15×13</span>
+            <span>RANTAI BOM ON</span>
+            <span>SIAP SENTUH</span>
           </div>
         </footer>
       </motion.div>
